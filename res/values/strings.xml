@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">YubiTOTP</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="totp1">TOTP from Slot 1</string>
+    <string name="totp2">TOTP from Slot 2</string>
+    <string name="program">Program NEO</string>
+
+</resources>
