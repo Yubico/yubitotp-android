@@ -62,7 +62,7 @@
 						<platform>17</platform>
 					</sdk>
           <proguard>
-            <skip>true</skip>
+            <skip>false</skip>
           </proguard>
 				</configuration>
 			</plugin>
