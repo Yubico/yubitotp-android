@@ -54,6 +54,8 @@ public class TotpActivity extends Activity {
 	private static final int STATE_PROGRAMMING = 0;
 	private static final int STATE_CHALLENGE = 1;
 	
+	private PendingIntent tagIntent;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -123,31 +125,41 @@ public class TotpActivity extends Activity {
 				disableDispatch();
 			}
 		});
+		if(swipeDialog != null) {
+			swipeDialog.cancel();
+		}
 		swipeDialog = programDialog.show();
 		enableDispatch(STATE_PROGRAMMING, slot, secret);
 	}
 	
 	private void enableDispatch(int state, int slot, String secret) {
-		Intent newIntent = new Intent(this, getClass());
-		newIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		newIntent.putExtra("state", state);
-		newIntent.putExtra("slot", slot);
+		Intent intent = new Intent(this, getClass());
+		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.putExtra("state", state);
+		intent.putExtra("slot", slot);
 		if(secret != null) {
-			newIntent.putExtra("secret", secret);
+			intent.putExtra("secret", secret);
+		} else {
+			intent.removeExtra("secret");
 		}
-    	PendingIntent pendingIntent = PendingIntent.getActivity(
-    			this, 0, newIntent, 0);
+    	tagIntent = PendingIntent.getActivity(
+    			this, 0, intent, 0);
     	
     	IntentFilter iso = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
     	
     	// register for foreground dispatch so we'll receive tags according to our intent filters
     	NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(
-    			this, pendingIntent, new IntentFilter[] {iso},
+    			this, tagIntent, new IntentFilter[] {iso},
     			new String[][] { new String[] { IsoDep.class.getName() } }
     			);
 	}
 	
 	private void disableDispatch() {
+		Log.i(logTag, "Disabling dispatch.");
+		if(tagIntent != null) {
+			tagIntent.cancel();
+			tagIntent = null;
+		}
 		NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
 	}
 
@@ -159,6 +171,7 @@ public class TotpActivity extends Activity {
 			if(tag != null) {
 				IsoDep isoTag = IsoDep.get(tag);
 				try {
+					Log.i(logTag, "state is " + state + " and slot is " + slot);
 					isoTag.connect();
 					byte[] resp = isoTag.transceive(selectCommand);
 					int length = resp.length;
@@ -177,11 +190,12 @@ public class TotpActivity extends Activity {
 					}
 					isoTag.close();
 					// must be cancel to run the onCancel listener
-					swipeDialog.cancel();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				swipeDialog.cancel();
+				swipeDialog = null;
 			}
 		}
 	}
@@ -221,7 +235,7 @@ public class TotpActivity extends Activity {
 			String totp = String.format("%06d", code % 1000000);
 			showOtpDialog(totp);
 		} else {
-			Toast.makeText(this, "fubar", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.totp_failed, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -246,6 +260,11 @@ public class TotpActivity extends Activity {
 		System.arraycopy(structure, 0, apdu, 5, structure.length);
 		
 		byte[] resp = isoTag.transceive(apdu);
+		if(resp[resp.length - 2] == (byte)0x90 && resp[resp.length - 1] == 0x00) {
+			Toast.makeText(this, this.getString(R.string.prog_success, slot), Toast.LENGTH_LONG).show();
+		} else {
+			Toast.makeText(this, R.string.prog_fail, Toast.LENGTH_LONG).show();
+		}
 		String rApdu = new String();
 		for(byte b : resp) {
 			rApdu += String.format("0x%x ", b);
@@ -293,15 +312,16 @@ public class TotpActivity extends Activity {
 				disableDispatch();
 			}
 		});
+		if(swipeDialog != null) {
+			swipeDialog.cancel();
+		}
 		swipeDialog = challengeDialog.show();
 		enableDispatch(STATE_CHALLENGE, slot, null);
 	}
-	
-
 
 	private void showOtpDialog(final String totp) {
 		AlertDialog.Builder otpDialog = new AlertDialog.Builder(this);
-		final TextView input = (TextView) TextView.inflate(this,
+		TextView input = (TextView) TextView.inflate(this,
 				R.layout.otp_display, null);
 		input.setText(totp);
 		otpDialog.setView(input);
@@ -316,6 +336,7 @@ public class TotpActivity extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				ClipboardManager clipboard = (ClipboardManager) TotpActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
 				clipboard.setPrimaryClip(ClipData.newPlainText(TotpActivity.this.getText(R.string.clip_label), totp));
+				Toast.makeText(TotpActivity.this, R.string.copied, Toast.LENGTH_SHORT).show();
 				dialog.dismiss();
 			}
 		});
