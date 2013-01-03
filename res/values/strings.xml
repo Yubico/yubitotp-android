@@ -7,5 +7,20 @@
     <string name="totp1">TOTP from Slot 1</string>
     <string name="totp2">TOTP from Slot 2</string>
     <string name="program">Program NEO</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="warning">Warning</string>
+    <string name="barcode_scanner_not_found">Barcode scanner not found</string>
+    <string name="invalid_barcode">The scanned Barcode is invalid</string>
+    <string name="scan_failed">Barcode scanning failed</string>
+    <string name="program_slot">Which slot should be programmed?</string>
+    <string name="programming">Programming</string>
+    <string name="swipe">Please swipe your YubiKey NEO</string>
+    <string name="swipe_and_hold">Please swipe and hold your YubiKey NEO</string>
+    
+    <string-array name="slots">
+        <item >Slot 1</item>
+        <item >Slot 2</item>
+    </string-array>
 
 </resources>
