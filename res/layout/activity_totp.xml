@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
+        android:onClick="onTotp1Click"
         android:text="@string/totp1" />
 
     <Button
@@ -22,6 +23,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="80dp"
+        android:onClick="onTotp2Click"
         android:text="@string/totp2" />
 
     <Button

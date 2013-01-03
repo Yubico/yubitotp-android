@@ -15,8 +15,13 @@
     <string name="scan_failed">Barcode scanning failed</string>
     <string name="program_slot">Which slot should be programmed?</string>
     <string name="programming">Programming</string>
+    <string name="challenging">Challenging</string>
     <string name="swipe">Please swipe your YubiKey NEO</string>
     <string name="swipe_and_hold">Please swipe and hold your YubiKey NEO</string>
+    <string name="totp">Oath TOTP</string>
+    <string name="ok">OK</string>
+    <string name="copy">Copy to clipboard</string>
+    <string name="clip_label">TOTP originating from a YubiKey NEO</string>
     
     <string-array name="slots">
         <item >Slot 1</item>

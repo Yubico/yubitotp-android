@@ -10,6 +10,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,9 +20,11 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.Bundle;
+import android.content.ClipboardManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yubico.base.Configurator;
@@ -36,7 +40,6 @@ public class TotpActivity extends Activity {
 
 	private static final byte[] selectCommand = {0x00, (byte) 0xA4, 0x04, 0x00, 0x07, (byte) 0xA0, 0x00, 0x00, 0x05, 0x27, 0x20, 0x01, 0x00};
 	private static final byte[] totpCommand = {0x00, 0x01, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00};
-	private static final byte[] programCommand = {0x00, 0x01, 0x00};
 	
 	private static final int totp_step = 30;
 	
@@ -64,9 +67,7 @@ public class TotpActivity extends Activity {
 		return true;
 	}
 
-	public void onProgramClick(View view)  
-	{  
-	    Toast.makeText(this, "Button clicked!", Toast.LENGTH_SHORT).show();  
+	public void onProgramClick(View view) {  
 		Intent intent = new Intent(
 				"com.google.zxing.client.android.SCAN");
 		intent.setPackage("com.google.zxing.client.android");
@@ -167,7 +168,7 @@ public class TotpActivity extends Activity {
 							doProgramYubiKey(isoTag, slot, intent.getStringExtra("secret"));
 							break;
 						case STATE_CHALLENGE:
-							// TODO: do something
+							doChallengeYubiKey(isoTag, slot);
 							break;
 						default:
 						}
@@ -175,12 +176,52 @@ public class TotpActivity extends Activity {
 						
 					}
 					isoTag.close();
-					swipeDialog.dismiss();
+					// must be cancel to run the onCancel listener
+					swipeDialog.cancel();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+
+	private void doChallengeYubiKey(IsoDep isoTag, int slot) throws IOException {
+		long time = System.currentTimeMillis() / 1000 / totp_step;
+		byte apdu[] = new byte[totpCommand.length + 4];
+		System.arraycopy(totpCommand, 0, apdu, 0, totpCommand.length);
+		
+		switch(slot) {
+		case 1:
+			apdu[2] = SLOT_CHAL_HMAC1;
+			break;
+		case 2:
+			apdu[2] = SLOT_CHAL_HMAC2;
+			break;
+		}
+		
+		apdu[totpCommand.length] = (byte) (time >> 24);
+		apdu[totpCommand.length + 1] = (byte) (time >> 16);
+		apdu[totpCommand.length + 2] = (byte) (time >> 8);
+		apdu[totpCommand.length + 3] = (byte) time;
+		
+		String dApdu = new String();
+		for(byte b : apdu) {
+			dApdu += String.format("0x%x ", b);
+		}
+		Log.i(logTag, "challenge for slot " + slot + " with apdu: " + dApdu);
+			
+		byte[] totpApdu = isoTag.transceive(apdu);
+		if(totpApdu.length == 22 && totpApdu[20] == (byte)0x90 && totpApdu[21] == 0x00) {
+			int offset = totpApdu[19] & 0xf;
+			int code = ((totpApdu[offset++] & 0x7f) << 24) |
+					((totpApdu[offset++] & 0xff) << 16) |
+					((totpApdu[offset++] & 0xff) << 8) |
+					((totpApdu[offset++] & 0xff));
+			String totp = String.format("%06d", code % 1000000);
+			showOtpDialog(totp);
+		} else {
+			Toast.makeText(this, "fubar", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -232,5 +273,52 @@ public class TotpActivity extends Activity {
 					}
 				});
 		downloadDialog.show();
+	}
+	
+	public void onTotp1Click(View view) {
+		challengeYubiKey(1);
+	}
+	
+	public void onTotp2Click(View view) {
+		challengeYubiKey(2);
+	}
+
+	private void challengeYubiKey(int slot) {
+		Log.i(logTag, "challenge for slot " + slot);
+		AlertDialog.Builder challengeDialog = new AlertDialog.Builder(this);
+		challengeDialog.setTitle(R.string.challenging);
+		challengeDialog.setMessage(R.string.swipe);
+		challengeDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			public void onCancel(DialogInterface dialog) {
+				disableDispatch();
+			}
+		});
+		swipeDialog = challengeDialog.show();
+		enableDispatch(STATE_CHALLENGE, slot, null);
+	}
+	
+
+
+	private void showOtpDialog(final String totp) {
+		AlertDialog.Builder otpDialog = new AlertDialog.Builder(this);
+		final TextView input = (TextView) TextView.inflate(this,
+				R.layout.otp_display, null);
+		input.setText(totp);
+		otpDialog.setView(input);
+		
+		otpDialog.setTitle(R.string.totp);
+		otpDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		otpDialog.setNegativeButton(R.string.copy, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				ClipboardManager clipboard = (ClipboardManager) TotpActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+				clipboard.setPrimaryClip(ClipData.newPlainText(TotpActivity.this.getText(R.string.clip_label), totp));
+				dialog.dismiss();
+			}
+		});
+		otpDialog.show();
 	}
 }
