@@ -2,8 +2,7 @@
 <resources>
 
     <string name="app_name">YubiTOTP</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="menu_settings">Settings</string>
+    <string name="about">About</string>
     <string name="totp1">TOTP from Slot 1</string>
     <string name="totp2">TOTP from Slot 2</string>
     <string name="program">Program NEO</string>
@@ -26,6 +25,7 @@
     <string name="totp_failed">Failed getting TOTP, is the YubiKey configured in challenge-response mode?</string>
     <string name="prog_success">Successfully programmed slot %d of the YubiKey NEO</string>
     <string name="prog_fail">Failed to program the YubiKey NEO</string>
+    <string name="version">Version</string>
     
     <string-array name="slots">
         <item >Slot 1</item>

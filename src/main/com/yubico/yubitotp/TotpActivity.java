@@ -21,8 +21,11 @@ import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.Bundle;
 import android.content.ClipboardManager;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,11 +64,39 @@ public class TotpActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_totp);
 	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		disableDispatch();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_totp, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(item.getItemId() == R.id.menu_about) {
+			try {
+				PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+				AlertDialog.Builder aboutDialog = new AlertDialog.Builder(this);
+				aboutDialog.setTitle(R.string.about);
+				aboutDialog.setMessage(getText(R.string.version) + " " + packageInfo.versionName);
+				aboutDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				aboutDialog.show();
+			} catch (NameNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return true;
 	}
 
