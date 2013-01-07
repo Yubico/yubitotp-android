@@ -186,7 +186,6 @@ public class TotpActivity extends Activity {
 	}
 	
 	private void disableDispatch() {
-		Log.i(logTag, "Disabling dispatch.");
 		if(tagIntent != null) {
 			tagIntent.cancel();
 			tagIntent = null;
@@ -202,7 +201,6 @@ public class TotpActivity extends Activity {
 			if(tag != null) {
 				IsoDep isoTag = IsoDep.get(tag);
 				try {
-					Log.i(logTag, "state is " + state + " and slot is " + slot);
 					isoTag.connect();
 					byte[] resp = isoTag.transceive(selectCommand);
 					int length = resp.length;
@@ -249,12 +247,6 @@ public class TotpActivity extends Activity {
 		apdu[totpCommand.length + 1] = (byte) (time >> 16);
 		apdu[totpCommand.length + 2] = (byte) (time >> 8);
 		apdu[totpCommand.length + 3] = (byte) time;
-		
-		String dApdu = new String();
-		for(byte b : apdu) {
-			dApdu += String.format("0x%x ", b);
-		}
-		Log.i(logTag, "challenge for slot " + slot + " with apdu: " + dApdu);
 			
 		byte[] totpApdu = isoTag.transceive(apdu);
 		if(totpApdu.length == 22 && totpApdu[20] == (byte)0x90 && totpApdu[21] == 0x00) {
@@ -271,7 +263,6 @@ public class TotpActivity extends Activity {
 	}
 
 	private void doProgramYubiKey(IsoDep isoTag, int slot, String secret) throws IOException {
-		Log.i(logTag, "programming slot " + slot + " with secret " + secret);
 		Base32 base32 = new Base32();
 		byte[] decoded = base32.decode(secret.toUpperCase());
 		byte[] key = new byte[20];
