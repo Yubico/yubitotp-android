@@ -26,6 +26,8 @@
     <string name="prog_success">Successfully programmed slot %d of the YubiKey NEO</string>
     <string name="prog_fail">Failed to program the YubiKey NEO</string>
     <string name="version">Version</string>
+    <string name="lost_tag">YubiKey NEO lost during operation</string>
+    <string name="tag_error">Error communication with YubiKey: </string>
     
     <string-array name="slots">
         <item >Slot 1</item>

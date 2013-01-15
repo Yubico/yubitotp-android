@@ -48,6 +48,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.nfc.TagLostException;
 import android.nfc.tech.IsoDep;
 import android.os.Bundle;
 import android.content.ClipboardManager;
@@ -249,9 +250,10 @@ public class TotpActivity extends Activity {
 					}
 					isoTag.close();
 					// must be cancel to run the onCancel listener
+				} catch (TagLostException e) {
+					Toast.makeText(this, R.string.lost_tag, Toast.LENGTH_LONG).show();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Toast.makeText(this, getText(R.string.tag_error) + e.getMessage(), Toast.LENGTH_LONG).show();
 				}
 				swipeDialog.cancel();
 				swipeDialog = null;
