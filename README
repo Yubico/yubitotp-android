@@ -6,7 +6,7 @@ See the file COPYING for copyright and license information.
 Introduction
 ------------
 
-This is a small android application for doint Oath TOTP codes with
+This is a small android application for doing Oath TOTP codes with
 the help of a YubiKey NEO.
 To use it when you have a TOTP qr-code:
 
