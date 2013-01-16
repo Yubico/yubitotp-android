@@ -47,6 +47,7 @@
           <artifactId>maven-release-plugin</artifactId>
           <version>2.2.2</version>
           <configuration>
+            <goals>package</goals>
             <localCheckout>true</localCheckout>
             <pushChanges>false</pushChanges>
           </configuration>
@@ -70,9 +71,46 @@
 	</build>
   <profiles>
     <profile>
-      <id>sign</id>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jarsigner-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>signing</id>
+                <goals>
+                  <goal>sign</goal>
+                  <goal>verify</goal>
+                </goals>
+                <phase>package</phase>
+                <inherited>true</inherited>
+                <configuration>
+                  <removeExistingSignatures>true</removeExistingSignatures>
+                  <archiveDirectory/>
+                  <includes>
+                    <include>${project.build.directory}/${project.artifactId}.apk</include>
+                  </includes>
+                  <keystore>NONE</keystore>
+                  <storetype>PKCS11</storetype>
+                  <alias>Certificate</alias>
+                  <storepass>${sign.storepass}</storepass>
+                  <arguments>
+                    <argument>-sigalg</argument><argument>MD5withRSA</argument>
+                    <argument>-digestalg</argument><argument>SHA1</argument>
+                  </arguments>
+                  <verbose>true</verbose>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>com.jayway.maven.plugins.android.generation2</groupId>
             <artifactId>android-maven-plugin</artifactId>
@@ -81,7 +119,19 @@
               <sign>
                 <debug>false</debug>
               </sign>
+              <zipalign>
+                <skip>false</skip>
+              </zipalign>
             </configuration>
+            <executions>
+              <execution>
+                <id>alignApk</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>zipalign</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
