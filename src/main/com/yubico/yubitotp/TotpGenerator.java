@@ -119,7 +119,7 @@ public class TotpGenerator extends Activity {
 
 
 	private void enableDispatch(int state, int slot, String secret) {
-		Intent intent = new Intent(this, getClass());
+		Intent intent = getIntent();
 		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		intent.putExtra("state", state);
 		intent.putExtra("slot", slot);
@@ -210,7 +210,7 @@ public class TotpGenerator extends Activity {
 					((totpApdu[offset++] & 0xff) << 8) |
 					((totpApdu[offset++] & 0xff));
 			String totp = String.format("%06d", code % 1000000);
-			Intent data = new Intent();
+			Intent data = getIntent();
 			data.putExtra("totp", totp);
 			setResult(RESULT_OK, data);
 		} else {

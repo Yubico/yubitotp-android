@@ -28,8 +28,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TotpWidgetConfigure"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".TotpGenerator"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity android:name=".TotpWidgetActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <receiver
+            android:name=".TotpWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/yubitotp_widget_info"/>
+        </receiver>
     </application>
 
 </manifest>

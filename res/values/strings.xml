@@ -29,6 +29,9 @@
     <string name="tag_error">Error communication with YubiKey: </string>
     <string name="slot1">Slot 1</string>
     <string name="slot2">Slot 2</string>
+    <string name="totp_default"></string>
+    <string name="widget_image">YubiKey image for widget</string>
+    <string name="which_slot">Which slot should be used?</string>
     
     <string-array name="slots">
         <item >Slot 1</item>

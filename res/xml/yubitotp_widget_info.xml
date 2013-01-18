@@ -1,0 +1,9 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="75dp"
+    android:minHeight="36dp"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/totp_widget"
+    android:configure="com.yubico.yubitotp.TotpWidgetConfigure" 
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:previewImage="@drawable/widget"/>
