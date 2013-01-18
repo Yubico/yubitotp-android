@@ -18,7 +18,6 @@
     <string name="swipe">Please swipe your YubiKey NEO</string>
     <string name="swipe_and_hold">Please swipe and hold your YubiKey NEO</string>
     <string name="totp">Oath TOTP</string>
-    <string name="ok">OK</string>
     <string name="copy">Copy to clipboard</string>
     <string name="clip_label">TOTP originating from a YubiKey NEO</string>
     <string name="copied">TOTP copied to clipboard</string>
@@ -28,6 +27,8 @@
     <string name="version">Version</string>
     <string name="lost_tag">YubiKey NEO lost during operation</string>
     <string name="tag_error">Error communication with YubiKey: </string>
+    <string name="slot1">Slot 1</string>
+    <string name="slot2">Slot 2</string>
     
     <string-array name="slots">
         <item >Slot 1</item>
