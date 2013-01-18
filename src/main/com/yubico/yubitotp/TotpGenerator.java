@@ -133,11 +133,37 @@ public class TotpGenerator extends Activity {
 
 		IntentFilter iso = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
 
-		// register for foreground dispatch so we'll receive tags according to our intent filters
-		NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(
-				this, tagIntent, new IntentFilter[] {iso},
-				new String[][] { new String[] { IsoDep.class.getName() } }
-				);
+		NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+		if(adapter.isEnabled()) {
+			// register for foreground dispatch so we'll receive tags according to our intent filters
+			NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(
+					this, tagIntent, new IntentFilter[] {iso},
+					new String[][] { new String[] { IsoDep.class.getName() } }
+					);
+		} else {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+			dialog.setTitle(R.string.nfc_off);
+			dialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					Intent settings = new Intent(android.provider.Settings.ACTION_NFC_SETTINGS);
+					TotpGenerator.this.startActivity(settings);
+					dialog.dismiss();
+					finish();
+				}
+			});
+			dialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					finish();
+				}
+			});
+			dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					finish();
+				}
+			});
+			dialog.show();
+		}
 	}
 
 	private void disableDispatch() {
