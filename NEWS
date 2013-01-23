@@ -1,5 +1,9 @@
 yubitotp-android NEWS -- History of user-visible changes.     -*- outline -*-
 
-* Version 0.0.1 (unreleased)
+* Version 0.0.2 (unreleased)
+
+** Add a widget for doing totp from homescreen.
+
+* Version 0.0.1 (released 2013-01-16)
 
 ** Initial release.
