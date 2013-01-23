@@ -33,6 +33,7 @@ package com.yubico.yubitotp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -44,6 +45,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -220,9 +222,17 @@ public class TotpActivity extends Activity {
 			}
 		});
 		otpDialog.setNegativeButton(R.string.copy, new DialogInterface.OnClickListener() {
+			@SuppressWarnings("deprecation")
+			@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 			public void onClick(DialogInterface dialog, int which) {
-				ClipboardManager clipboard = (ClipboardManager) TotpActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
-				clipboard.setPrimaryClip(ClipData.newPlainText(TotpActivity.this.getText(R.string.clip_label), totp));
+				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+					// use the deprecated clipboard api below level 11
+					android.text.ClipboardManager clipboard = (android.text.ClipboardManager) TotpActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+					clipboard.setText(totp);
+				} else {
+					ClipboardManager clipboard = (ClipboardManager) TotpActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+					clipboard.setPrimaryClip(ClipData.newPlainText(TotpActivity.this.getText(R.string.clip_label), totp));
+				}
 				Toast.makeText(TotpActivity.this, R.string.copied, Toast.LENGTH_SHORT).show();
 				dialog.dismiss();
 			}
