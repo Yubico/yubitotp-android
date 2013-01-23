@@ -6,4 +6,4 @@
     android:configure="com.yubico.yubitotp.TotpWidgetConfigure" 
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:previewImage="@drawable/widget"/>
+    android:previewImage="@drawable/widget_empty"/>
