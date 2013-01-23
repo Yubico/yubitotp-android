@@ -134,6 +134,11 @@ public class TotpGenerator extends Activity {
 		IntentFilter iso = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
 
 		NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+		if(adapter == null) {
+			Toast.makeText(this, R.string.no_nfc, Toast.LENGTH_LONG).show();
+			finish();
+			return;
+		}
 		if(adapter.isEnabled()) {
 			// register for foreground dispatch so we'll receive tags according to our intent filters
 			NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(
@@ -171,7 +176,10 @@ public class TotpGenerator extends Activity {
 			tagIntent.cancel();
 			tagIntent = null;
 		}
-		NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
+		NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+		if(adapter != null) {
+			adapter.disableForegroundDispatch(this);
+		}
 	}
 
 	public void onNewIntent(Intent intent) {

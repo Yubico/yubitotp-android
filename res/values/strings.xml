@@ -33,6 +33,7 @@
     <string name="widget_image">YubiKey image for widget</string>
     <string name="which_slot">Which slot should be used?</string>
     <string name="nfc_off">NFC seems to be off, turn on?</string>
+    <string name="no_nfc">This device seems to not support NFC</string>
     
     <string-array name="slots">
         <item >Slot 1</item>
