@@ -22,7 +22,7 @@
     <string name="clip_label">TOTP originating from a YubiKey NEO</string>
     <string name="copied">TOTP copied to clipboard</string>
     <string name="totp_failed">Failed getting TOTP, is the YubiKey configured in challenge-response mode?</string>
-    <string name="prog_success">Successfully programmed slot %d of the YubiKey NEO</string>
+    <string name="prog_success">Successfully programmed slot %1$d of the YubiKey NEO</string>
     <string name="prog_fail">Failed to program the YubiKey NEO</string>
     <string name="version">Version</string>
     <string name="lost_tag">YubiKey NEO lost during operation</string>

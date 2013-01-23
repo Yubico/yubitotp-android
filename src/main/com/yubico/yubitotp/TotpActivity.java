@@ -152,7 +152,8 @@ public class TotpActivity extends Activity {
 			}
 		} else if(requestCode == PROGRAM) {
 			if (resultCode == RESULT_OK) {
-				Toast.makeText(this, R.string.prog_success, Toast.LENGTH_LONG).show();
+				int slot = intent.getIntExtra("slot", -1);
+				Toast.makeText(this, String.format(this.getString(R.string.prog_success), slot), Toast.LENGTH_LONG).show();
 			}
 		} else if(requestCode == TOTP) {
 			if (resultCode == RESULT_OK) {
@@ -168,6 +169,7 @@ public class TotpActivity extends Activity {
 		Log.i(logTag, "Programming slot " + slot);
 		Intent programIntent = new Intent(this, TotpGenerator.class);
 		programIntent.putExtra("secret", secret);
+		programIntent.putExtra("slot", slot);
 		this.startActivityForResult(programIntent, PROGRAM);
 	}
 	

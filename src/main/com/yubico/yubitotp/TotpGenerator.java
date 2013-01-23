@@ -273,7 +273,7 @@ public class TotpGenerator extends Activity {
 
 		byte[] resp = isoTag.transceive(apdu);
 		if(resp[resp.length - 2] == (byte)0x90 && resp[resp.length - 1] == 0x00) {
-			setResult(RESULT_OK);
+			setResult(RESULT_OK, getIntent());
 		} else {
 			Toast.makeText(this, R.string.prog_fail, Toast.LENGTH_LONG).show();
 			setResult(RESULT_CANCELED);
