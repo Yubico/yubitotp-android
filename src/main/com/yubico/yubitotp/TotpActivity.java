@@ -71,8 +71,8 @@ public class TotpActivity extends Activity {
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
+	protected void onStop() {
+		super.onStop();
 		finish();
 	}
 
