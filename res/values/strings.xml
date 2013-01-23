@@ -9,7 +9,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="warning">Warning</string>
-    <string name="barcode_scanner_not_found">Barcode scanner not found</string>
+    <string name="barcode_scanner_not_found">Barcode scanner not found, do you want to install it?</string>
     <string name="invalid_barcode">The scanned Barcode is invalid</string>
     <string name="scan_failed">Barcode scanning failed</string>
     <string name="program_slot">Which slot should be programmed?</string>
