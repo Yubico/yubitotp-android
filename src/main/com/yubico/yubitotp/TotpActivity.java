@@ -65,6 +65,7 @@ public class TotpActivity extends Activity {
 	// is 16 the max length?
 	private static final Pattern secretPattern = Pattern.compile("^otpauth://totp/.*?secret=([a-z2-7=]{0,32})$", Pattern.CASE_INSENSITIVE);
 
+	private static boolean waitingForResult = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +76,9 @@ public class TotpActivity extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		finish();
+		if(!waitingForResult) {
+			finish();
+		}
 	}
 
 	@Override
@@ -116,7 +119,7 @@ public class TotpActivity extends Activity {
 		
 		try {
 			startActivityForResult(intent, SCAN_BARCODE);
-
+			waitingForResult = true;
 		} catch (ActivityNotFoundException e) {
 			barcodeScannerNotInstalled(
 					getString(R.string.warning),
@@ -128,6 +131,7 @@ public class TotpActivity extends Activity {
 	}
 	
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		waitingForResult = false;
 		if (requestCode == SCAN_BARCODE) {
 			if (resultCode == RESULT_OK) {
 				String content = intent.getStringExtra("SCAN_RESULT");
@@ -171,6 +175,7 @@ public class TotpActivity extends Activity {
 		programIntent.putExtra("secret", secret);
 		programIntent.putExtra("slot", slot);
 		this.startActivityForResult(programIntent, PROGRAM);
+		waitingForResult = true;
 	}
 	
 	private void barcodeScannerNotInstalled(String stringTitle,
@@ -208,6 +213,7 @@ public class TotpActivity extends Activity {
 		Intent totpIntent = new Intent(this, TotpGenerator.class);
 		totpIntent.putExtra("slot", slot);
 		this.startActivityForResult(totpIntent, TOTP);
+		waitingForResult = true;
 	}
 	
 	private void showOtpDialog(final String totp) {
