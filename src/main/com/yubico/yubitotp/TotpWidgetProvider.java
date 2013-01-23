@@ -1,19 +1,29 @@
 package com.yubico.yubitotp;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.TypedValue;
 import android.widget.RemoteViews;
 
 public class TotpWidgetProvider extends AppWidgetProvider {
+	private static final Map<Integer, Integer> sizeMap = new ConcurrentHashMap<Integer, Integer>();
+	
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		// clear up our settings
 		for(int appWidgetId : appWidgetIds) {
 			TotpWidgetConfigure.deleteSelectedSlot(context, appWidgetId);
+			sizeMap.remove(appWidgetId);
 		}
 		
 		super.onDeleted(context, appWidgetIds);
@@ -44,6 +54,21 @@ public class TotpWidgetProvider extends AppWidgetProvider {
 		}
 	}
 
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	@Override
+	public void onAppWidgetOptionsChanged(Context context,
+			AppWidgetManager appWidgetManager, int appWidgetId,
+			Bundle newOptions) {
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId,
+				newOptions);
+		
+		// find out the new width and put it away in a map for later usage
+		int width = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
+		sizeMap.put(appWidgetId, width);
+		updateAppWidget(context, appWidgetManager, appWidgetId, null);
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public static void updateAppWidget(Context context,
 			AppWidgetManager appWidgetManager, int appWidgetId, String totp) {
 		Intent totpIntent = new Intent(context, TotpWidgetActivity.class);
@@ -65,6 +90,13 @@ public class TotpWidgetProvider extends AppWidgetProvider {
 			updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 			PendingIntent pendingUpdate = PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 30 * 1000, pendingUpdate);
+		}
+		
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
+				sizeMap.containsKey(appWidgetId)) {
+			// make a guess on the text size based on the width
+			int width = sizeMap.get(appWidgetId);
+			views.setTextViewTextSize(R.id.totp_text, TypedValue.COMPLEX_UNIT_SP, width / 5);
 		}
 		
 		views.setTextViewText(R.id.totp_text, totp);
