@@ -1,8 +1,5 @@
 package com.yubico.yubitotp;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -15,15 +12,12 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.widget.RemoteViews;
 
-public class TotpWidgetProvider extends AppWidgetProvider {
-	private static final Map<Integer, Integer> sizeMap = new ConcurrentHashMap<Integer, Integer>();
-	
+public class TotpWidgetProvider extends AppWidgetProvider {	
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		// clear up our settings
 		for(int appWidgetId : appWidgetIds) {
-			TotpWidgetConfigure.deleteSelectedSlot(context, appWidgetId);
-			sizeMap.remove(appWidgetId);
+			TotpWidgetConfigure.deletePrefs(context, appWidgetId);
 		}
 		
 		super.onDeleted(context, appWidgetIds);
@@ -64,7 +58,11 @@ public class TotpWidgetProvider extends AppWidgetProvider {
 		
 		// find out the new width and put it away in a map for later usage
 		int width = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
-		sizeMap.put(appWidgetId, width);
+		int height = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
+		if(height * 2.5 < width) {
+			width = (int) (height * 2.5);
+		}
+		TotpWidgetConfigure.setWidth(context, appWidgetId, width);
 		updateAppWidget(context, appWidgetManager, appWidgetId, null);
 	}
 
@@ -92,11 +90,12 @@ public class TotpWidgetProvider extends AppWidgetProvider {
 			alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 30 * 1000, pendingUpdate);
 		}
 		
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
-				sizeMap.containsKey(appWidgetId)) {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			// make a guess on the text size based on the width
-			int width = sizeMap.get(appWidgetId);
-			views.setTextViewTextSize(R.id.totp_text, TypedValue.COMPLEX_UNIT_SP, width / 5);
+			int width = TotpWidgetConfigure.getWidth(context, appWidgetId);
+			if(width > 0) {
+				views.setTextViewTextSize(R.id.totp_text, TypedValue.COMPLEX_UNIT_SP, width / 5);
+			}
 		}
 		
 		views.setTextViewText(R.id.totp_text, totp);

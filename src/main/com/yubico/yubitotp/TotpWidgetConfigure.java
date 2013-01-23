@@ -73,9 +73,21 @@ public class TotpWidgetConfigure extends Activity {
 		return prefs.getInt(appWidgetId + "_slot", 0);
 	}
 	
-	public static void deleteSelectedSlot(Context context, int appWidgetId) {
+	public static void deletePrefs(Context context, int appWidgetId) {
 		SharedPreferences.Editor prefs = context.getSharedPreferences(PREF_NAME, 0).edit();
 		prefs.remove(appWidgetId + "_slot");
+		prefs.remove(appWidgetId + "_width");
 		prefs.commit();
+	}
+	
+	public static void setWidth(Context context, int appWidgetId, int width) {
+		SharedPreferences.Editor prefs = context.getSharedPreferences(PREF_NAME, 0).edit();
+		prefs.putInt(appWidgetId + "_width", width);
+		prefs.commit();
+	}
+	
+	public static int getWidth(Context context, int appWidgetId) {
+		SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, 0);
+		return prefs.getInt(appWidgetId + "_width", -1);
 	}
 }
