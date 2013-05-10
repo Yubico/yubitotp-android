@@ -30,9 +30,6 @@
 
 package com.yubico.yubitotp;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -61,10 +58,6 @@ public class TotpActivity extends Activity {
 	private static final int TOTP = 2;
 
 	private static final String logTag = "yubitotp";
-
-	// is 16 the max length?
-	private static final Pattern secretPattern = Pattern.compile("^otpauth://totp/.*?secret=([a-z2-7=]{0,32})$", Pattern.CASE_INSENSITIVE);
-
 	private static boolean waitingForResult = false;
 	
 	@Override
@@ -135,12 +128,12 @@ public class TotpActivity extends Activity {
 		if (requestCode == SCAN_BARCODE) {
 			if (resultCode == RESULT_OK) {
 				String content = intent.getStringExtra("SCAN_RESULT");
-				Matcher matcher = secretPattern.matcher(content);
-				if(!matcher.matches()) {
+				Uri uri = Uri.parse(content);
+				final String secret = uri.getQueryParameter("secret"); 
+				if(secret == null || secret.isEmpty()) {
 					Toast.makeText(this, R.string.invalid_barcode, Toast.LENGTH_LONG).show();
 					return;
 				}
-				final String secret = matcher.group(1);
 				AlertDialog.Builder slotDialog = new AlertDialog.Builder(this);
 				slotDialog.setTitle(R.string.program_slot);
 				slotDialog.setItems(R.array.slots, new DialogInterface.OnClickListener() {
