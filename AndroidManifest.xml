@@ -37,6 +37,7 @@
         <activity android:name=".TotpGenerator"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity android:name=".TotpWidgetActivity"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <receiver
             android:name=".TotpWidgetProvider">
