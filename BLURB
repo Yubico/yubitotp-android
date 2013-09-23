@@ -1,0 +1,7 @@
+Author: Yubico
+Basename: yubitotp-android
+Homepage: http://opensource.yubico.com/yubitotp-android/
+License: BSD-2-Clause
+Name: yubitotp-android
+Project: yubitotp-android
+Summary: Android application for TOTP with YubiKey NEO
